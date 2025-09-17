@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>美味点菜系统</title>
+    <title>王馒头专属点餐菜单</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -112,6 +112,7 @@
             overflow: hidden;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
         }
         
         .dish-card:hover {
@@ -197,6 +198,18 @@
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px dashed #eee;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .remove-btn {
+            color: #ff6b6b;
+            cursor: pointer;
+            padding: 0 5px;
         }
         
         .order-total {
@@ -235,6 +248,32 @@
             margin-left: 5px;
         }
         
+        .empty-order {
+            text-align: center;
+            color: #999;
+            padding: 20px 0;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 16px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -255,7 +294,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>美味点菜系统</h1>
+            <h1>王馒头专属点餐菜单</h1>
             <p>选择您喜欢的菜品，享受美食时光</p>
         </header>
         
@@ -275,21 +314,22 @@
         </div>
         
         <div class="dishes-container" id="dishes-container">
-            <!-- 菜品将通过JavaScript动态生成 -->
         </div>
         
         <div class="order-summary">
-            <h2>订单汇总 <span class="counter" id="selected-count">0</span></h2>
+            <h2>王馒头今日想吃菜品如下： <span class="counter" id="selected-count">0</span></h2>
             <div id="selected-dishes">
                 <p class="empty-order">尚未选择任何菜品</p>
             </div>
-            <!-- <div class="order-total">
+            <div class="order-total">
                 <span>总计:</span>
                 <span id="total-price">¥0.00</span>
-            </div> -->
-            <button class="submit-btn" id="submit-order">选择完毕</button>
+            </div>
+            <button class="submit-btn" id="submit-order">选餐完毕</button>
         </div>
     </div>
+
+    <div class="toast" id="toast">点菜成功！</div>
 
     <script>
         // 菜品数据
@@ -316,14 +356,24 @@
             { id: 20, name: "炖蛋", category: "hot", price: 22, description: "嫩滑可口" },
             { id: 21, name: "蒜蓉生蚝", category: "seafood", price: 78, description: "蒜香浓郁，生蚝鲜美" },
             { id: 22, name: "啤酒鸭", category: "hot", price: 56, description: "啤酒醇香，鸭肉鲜美" },
-            { id: 23, name: "炒面", category: "hot", price: 68, description: "快乐碳水" },
-            { id: 24, name: "乌鸡汤", category: "soup", price: 38, description: "营养滋补" },
+            { id: 23, name: "炒面", category: "rice", price: 68, description: "快乐碳水" },
+            { id: 24, name: "乌鸡汤", category: "soup", price: 68, description: "营养滋补" },
             { id: 25, name: "排骨汤", category: "soup", price: 68, description: "可选配菜：海带、白萝卜、冬瓜" },
-            { id: 26, name: "鸭汤", category: "soup", price: 58, description: "清淡解腻" },
-            { id: 27, name: "清蒸鲈鱼", category: "hot", price: 58, description: "鲜嫩不腥" },
-            { id: 28, name: "煎牛排", category: "hot", price: 58, description: "西式餐点" },
-            { id: 29, name: "煎羊排", category: "hot", price: 48, description: "香味扑鼻" },
+            { id: 26, name: "鸭汤", category: "soup", price: 68, description: "清淡解腻" },
+            { id: 27, name: "清蒸鲈鱼", category: "seafood", price: 58, description: "鲜嫩不腥" },
+            { id: 28, name: "煎牛排", category: "hot", price: 78, description: "西式餐点" },
+            { id: 29, name: "煎羊排", category: "hot", price: 78, description: "香味扑鼻" },
+            { id: 30, name: "金汤肥牛", category: "hot", price: 58, description: "酸辣开胃" },
+            { id: 31, name: "木须肉", category: "hot", price: 38, description: "菜里包含：木耳、黄瓜、瘦肉、鸡蛋" },
+            { id: 32, name: "红烧肉", category: "hot", price: 58, description: "经典红烧口味" },
+            { id: 33, name: "日本豆腐煲", category: "hot", price: 38, description: "超绝日本豆腐" },
+            { id: 34, name: "葱油鸡", category: "hot", price: 48, description: "超级葱香滑嫩的鸡腿肉" },
+            { id: 36, name: "酱油五花肉", category: "hot", price: 58, description: "煎香咸甜，干香可口" },
+            { id: 37, name: "时蔬", category: "hot", price: 58, description: "季节新鲜蔬菜" },
         ];
+
+        // 存储当前选中的菜品
+        let selectedDishes = [];
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
@@ -337,6 +387,8 @@
             container.innerHTML = '';
             
             dishesToRender.forEach(dish => {
+                const isSelected = selectedDishes.some(item => item.id === dish.id);
+                
                 const dishElement = document.createElement('div');
                 dishElement.className = 'dish-card';
                 dishElement.dataset.category = dish.category;
@@ -351,7 +403,7 @@
                         <div class="dish-select">
                             <span class="dish-price">¥${dish.price.toFixed(2)}</span>
                             <label class="checkbox-container">
-                                <input type="checkbox" data-id="${dish.id}" data-name="${dish.name}" data-price="${dish.price}">
+                                <input type="checkbox" data-id="${dish.id}" data-name="${dish.name}" data-price="${dish.price}" ${isSelected ? 'checked' : ''}>
                                 点选
                             </label>
                         </div>
@@ -360,6 +412,9 @@
                 
                 container.appendChild(dishElement);
             });
+            
+            // 重新添加事件监听器
+            addCheckboxListeners();
         }
 
         // 设置事件监听器
@@ -372,7 +427,6 @@
                     dish.description.toLowerCase().includes(searchText)
                 );
                 renderDishes(filteredDishes);
-                addCheckboxListeners();
             });
 
             // 分类筛选
@@ -391,72 +445,108 @@
                     }
                     
                     renderDishes(filteredDishes);
-                    addCheckboxListeners();
                 });
             });
 
             // 提交订单
             document.getElementById('submit-order').addEventListener('click', function() {
-                const selectedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
-                if (selectedCount === 0) {
+                if (selectedDishes.length === 0) {
                     alert('请至少选择一道菜品');
                     return;
                 }
                 
-                alert('订单提交成功！即将为您准备美食！');
-                // 在实际应用中，这里会有提交到服务器的代码
+                showToast('订单提交成功！即将为您准备美食！');
             });
-
-            // 初始添加复选框监听器
-            addCheckboxListeners();
         }
 
         // 添加复选框监听器
         function addCheckboxListeners() {
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', updateOrderSummary);
+                checkbox.addEventListener('change', function() {
+                    const dishId = parseInt(this.dataset.id);
+                    const dishName = this.dataset.name;
+                    const dishPrice = parseFloat(this.dataset.price);
+                    
+                    if (this.checked) {
+                        // 添加到选中列表
+                        selectedDishes.push({ id: dishId, name: dishName, price: dishPrice });
+                    } else {
+                        // 从选中列表中移除
+                        selectedDishes = selectedDishes.filter(dish => dish.id !== dishId);
+                    }
+                    
+                    updateOrderSummary();
+                });
             });
         }
 
         // 更新订单摘要
         function updateOrderSummary() {
-            const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
             const selectedDishesContainer = document.getElementById('selected-dishes');
             const totalPriceElement = document.getElementById('total-price');
             const selectedCountElement = document.getElementById('selected-count');
             
             // 更新计数
-            selectedCountElement.textContent = selectedCheckboxes.length;
+            selectedCountElement.textContent = selectedDishes.length;
             
-            // 清空容器，但保留空订单消息
-            if (selectedCheckboxes.length === 0) {
+            // 清空容器
+            selectedDishesContainer.innerHTML = '';
+            
+            if (selectedDishes.length === 0) {
                 selectedDishesContainer.innerHTML = '<p class="empty-order">尚未选择任何菜品</p>';
                 totalPriceElement.textContent = '¥0.00';
                 return;
             }
             
-            // 移除空订单消息
-            if (selectedDishesContainer.querySelector('.empty-order')) {
-                selectedDishesContainer.innerHTML = '';
-            }
-            
             // 计算总价并添加选中的菜品
             let totalPrice = 0;
-            selectedCheckboxes.forEach(checkbox => {
-                const price = parseFloat(checkbox.dataset.price);
-                totalPrice += price;
+            selectedDishes.forEach(dish => {
+                totalPrice += dish.price;
                 
                 const dishElement = document.createElement('div');
                 dishElement.className = 'selected-item';
                 dishElement.innerHTML = `
-                    <span>${checkbox.dataset.name}</span>
-                    <span>¥${price.toFixed(2)}</span>
+                    <span>${dish.name}</span>
+                    <div>
+                        <span>¥${dish.price.toFixed(2)}</span>
+                        <span class="remove-btn" data-id="${dish.id}">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    </div>
                 `;
                 
                 selectedDishesContainer.appendChild(dishElement);
             });
             
+            // 添加移除按钮的事件监听
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const dishId = parseInt(this.dataset.id);
+                    selectedDishes = selectedDishes.filter(dish => dish.id !== dishId);
+                    
+                    // 更新UI
+                    updateOrderSummary();
+                    
+                    // 取消对应菜品的复选框选中状态
+                    const checkbox = document.querySelector(`input[data-id="${dishId}"]`);
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
+                });
+            });
+            
             totalPriceElement.textContent = `¥${totalPrice.toFixed(2)}`;
+        }
+
+        // 显示提示信息
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
     </script>
 </body>
