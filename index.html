@@ -92,6 +92,7 @@
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            color: #5a3e36;
         }
         
         .category-btn:hover, .category-btn.active {
@@ -216,7 +217,7 @@
             display: flex;
             justify-content: space-between;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1rem;
             padding-top: 10px;
             border-top: 2px solid #ff6b6b;
         }
@@ -229,7 +230,7 @@
             color: white;
             border: none;
             border-radius: 5px;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             cursor: pointer;
             margin-top: 15px;
             transition: background-color 0.3s ease;
@@ -294,7 +295,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>王馒头专属点餐菜单</h1>
+            <h2>王馒头专属点餐菜单</h2>
             <p>选择您喜欢的菜品，享受美食时光</p>
         </header>
         
@@ -317,7 +318,7 @@
         </div>
         
         <div class="order-summary">
-            <h2>王馒头今日想吃菜品如下： <span class="counter" id="selected-count">0</span></h2>
+            <h3>王馒头今日想吃菜品如下： <span class="counter" id="selected-count">0</span></h3>
             <div id="selected-dishes">
                 <p class="empty-order">尚未选择任何菜品</p>
             </div>
